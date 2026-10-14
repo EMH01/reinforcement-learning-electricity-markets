@@ -2,7 +2,7 @@
 
 Technical research on the design of reinforcement-learning systems for electricity-market trading, with emphasis on **environment design, point-in-time data, reward formulation, execution realism, risk, temporal backtesting, and the Iberian market context**.
 
-> **Status:** Working paper / narrative technical review. This repository is a public research artifact and has not been peer reviewed.
+> **Status:** Completed technical research review · Version 1.0 · October 2026. This is a public research report and has not been peer reviewed.
 
 ## Paper
 
@@ -37,20 +37,13 @@ The central research question of this work is therefore:
 
 > **What makes an RL environment for electricity-market decision-making methodologically defensible and operationally meaningful?**
 
-## Current scope
+## Scope and completion
 
-This repository currently contains the research review itself. It does **not** claim an original production trading strategy or client-derived empirical result.
+This research review is **complete for its intended scope**: identifying and organizing the methodological, algorithmic, simulation, evaluation, and market-design considerations needed to reason about reinforcement learning for electricity-market trading.
 
-A future public experimental companion may add:
+It does **not** claim an original production trading strategy, a client-derived empirical result, or an experimental benchmark.
 
-- a Gymnasium electricity-market environment built from public data
-- heuristic and no-trade baselines
-- PPO / SAC / TD3 comparisons
-- temporal train/validation/test splits
-- walk-forward evaluation
-- multiple random seeds
-- imbalance and risk-aware rewards
-- reproducible experiment tracking
+Version 1.0 closes the research scope covered by this repository. Future changes, if any, are expected to be limited to corrections, reference maintenance, or publication metadata rather than an expansion of the investigation.
 
 ## Citation
 
