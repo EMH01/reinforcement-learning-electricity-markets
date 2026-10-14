@@ -7,9 +7,18 @@ authors:
 version: "1.0"
 date-released: 2026-10-14
 url: "https://github.com/EMH01/reinforcement-learning-electricity-markets"
+keywords:
+  - reinforcement learning
+  - electricity markets
+  - energy trading
+  - environment design
+  - simulation
+  - temporal backtesting
+  - risk management
+  - sequential decision-making
 preferred-citation:
   type: report
-  title: "Aprendizaje por refuerzo para trading en mercados eléctricos: diseño del entorno, algoritmos, herramientas y evidencia aplicada"
+  title: "Aprendizaje por refuerzo aplicado a mercados eléctricos: diseño de entornos, algoritmos, herramientas y criterios de evaluación"
   authors:
     - family-names: "Martin Hernández"
       given-names: "Esther M."
