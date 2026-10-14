@@ -1,21 +1,17 @@
 cff-version: 1.2.0
-message: "If you use or reference this work, please cite it using the metadata below."
-title: "Aprendizaje por refuerzo para trading en mercados eléctricos: diseño del entorno, algoritmos, herramientas y evidencia aplicada"
-type: article
+message: "Please cite the completed technical report described in preferred-citation."
+title: "Reinforcement Learning for Electricity Markets — public research artifact"
 authors:
   - family-names: "Martin Hernández"
     given-names: "Esther M."
-keywords:
-  - reinforcement learning
-  - electricity markets
-  - energy trading
-  - PPO
-  - actor-critic
-  - intraday market
-  - imbalance
-  - temporal backtesting
-abstract: >-
-  Narrative and technical review of reinforcement learning for electricity-market
-  trading, covering environment design, observations, actions, rewards, constraints,
-  algorithm families, implementation tools, applied evidence, temporal evaluation,
-  and implications for the Iberian electricity market.
+version: "1.0"
+date-released: 2026-10-14
+url: "https://github.com/EMH01/reinforcement-learning-electricity-markets"
+preferred-citation:
+  type: report
+  title: "Aprendizaje por refuerzo para trading en mercados eléctricos: diseño del entorno, algoritmos, herramientas y evidencia aplicada"
+  authors:
+    - family-names: "Martin Hernández"
+      given-names: "Esther M."
+  year: 2026
+  url: "https://github.com/EMH01/reinforcement-learning-electricity-markets/blob/main/paper/reinforcement-learning-electricity-markets.md"
