@@ -1,7 +1,8 @@
 # Aprendizaje por refuerzo para trading en mercados eléctricos: diseño del entorno, algoritmos, herramientas y evidencia aplicada
 
 **Autora:** Esther M. Martin Hernández  
-**Estado:** Working paper · revisión narrativa y técnica para difusión pública
+**Estado:** Revisión técnica de investigación completada · Versión 1.0 · octubre de 2026  
+**Revisión por pares:** No
 
 ## Resumen
 
