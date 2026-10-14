@@ -1,47 +1,39 @@
 # Reinforcement Learning for Electricity Markets
 
-Technical research on the design of reinforcement-learning systems for electricity-market trading, with emphasis on **environment design, point-in-time data, reward formulation, execution realism, risk, temporal backtesting, and the Iberian market context**.
+Completed technical research report on reinforcement learning applied to electricity markets, focused on **environment design, observations and actions, reward formulation, constraints, simulation, temporal evaluation, risk, and reproducibility**.
 
-> **Status:** Completed technical research review · Version 1.0 · October 2026. This is a public research report and has not been peer reviewed.
+> **Status:** Completed technical research report · Version 1.0 · October 2026.
 
-## Paper
+## Report
 
-**Aprendizaje por refuerzo para trading en mercados eléctricos: diseño del entorno, algoritmos, herramientas y evidencia aplicada**
+**Aprendizaje por refuerzo aplicado a mercados eléctricos: diseño de entornos, algoritmos, herramientas y criterios de evaluación**
 
-[Read the manuscript](paper/reinforcement-learning-electricity-markets.md)
+[Read the report](paper/reinforcement-learning-electricity-markets.md)
 
-The review covers:
+The report covers:
 
-- MDP formulation for sequential electricity-market decisions
-- observation, action, reward, and constraint design
+- sequential decision-making and MDP formulation
+- observation and action-space design
+- reward functions and hard/soft constraints
 - PPO, DDPG, TD3, SAC, and offline RL
 - temporal architectures, multi-agent RL, imitation learning, and hierarchical RL
 - Gymnasium, PettingZoo, Stable-Baselines3, RLlib, CleanRL, TorchRL, Tianshou, and related tooling
-- market/asset/settlement simulation
-- evidence from recent electricity-market applications
+- market, asset, execution, and physical-system simulation
 - point-in-time data and leakage prevention
 - temporal backtesting, baselines, risk metrics, and reproducibility
-- implications for the Iberian electricity market
+- general application patterns reported in the electricity-market RL literature
 
 ## Sources and scope
 
-The report is based on **scientific literature, official documentation, and public sources**.
+The report is based on **scientific literature, official documentation, and public sources**. It is a narrative technical review intended to organize the state of the art and methodological design criteria.
 
-## Why this matters
+## Central question
 
-In reinforcement learning for electricity trading, algorithm choice is only one part of the problem. A policy can look successful while exploiting unrealistic execution, future information, weak baselines, or an incorrectly specified reward.
+> **What makes an RL environment for electricity-market decision-making methodologically defensible and reproducible?**
 
-The central research question of this work is therefore:
+## Completion
 
-> **What makes an RL environment for electricity-market decision-making methodologically defensible and operationally meaningful?**
-
-## Scope and completion
-
-This research review is **complete for its intended scope**: identifying and organizing the methodological, algorithmic, simulation, evaluation, and market-design considerations needed to reason about reinforcement learning for electricity-market trading.
-
-It does **not** claim an original production trading strategy or an experimental benchmark.
-
-Version 1.0 closes the research scope covered by this repository. Future changes, if any, are expected to be limited to corrections, reference maintenance, or publication metadata rather than an expansion of the investigation.
+Version 1.0 closes the research scope of this report. Future changes, if any, are expected to be limited to corrections, reference maintenance, or publication metadata.
 
 ## Citation
 
