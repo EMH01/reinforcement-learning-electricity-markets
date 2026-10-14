@@ -4,21 +4,21 @@
 **Tipo:** Informe técnico de investigación  
 **Versión:** 1.0 · octubre de 2026
 
-## Resumen
+# Resumen
 
 Los mercados eléctricos combinan incertidumbre, restricciones operativas, información que evoluciona en el tiempo y decisiones con consecuencias económicas acumulativas. Estas características han impulsado el uso del aprendizaje por refuerzo (*reinforcement learning*, RL) como marco para estudiar problemas de decisión secuencial. Su aplicación, sin embargo, depende tanto del diseño del entorno como del algoritmo elegido: es necesario definir qué información observa el agente, qué acciones puede ejecutar, cómo se representa el objetivo, qué restricciones deben respetarse y cómo se evalúa el comportamiento fuera de muestra. Este informe reúne y organiza los principales elementos metodológicos para diseñar y analizar sistemas de RL aplicados a mercados eléctricos. Se revisan la formulación mediante procesos de decisión de Markov, los espacios de observación y acción, las funciones de recompensa, el tratamiento de restricciones, las familias de algoritmos más utilizadas y las herramientas de implementación y simulación. También se sintetizan patrones de aplicación presentes en la literatura, incluyendo estrategias de oferta, activos flexibles, generación renovable, decisiones continuas y entornos multiagente. La revisión pone especial énfasis en la prevención de fuga de información, la fidelidad del simulador, el uso de baselines, la evaluación temporal y la trazabilidad experimental.
 
 **Palabras clave:** aprendizaje por refuerzo; mercados eléctricos; trading energético; diseño de entornos; simulación; backtesting temporal; gestión de riesgo; decisión secuencial.
 
-## 1. Introducción
+# 1. Introducción
 
-El aprendizaje por refuerzo aborda problemas en los que un agente observa información del entorno, selecciona acciones y recibe señales de recompensa con el objetivo de maximizar el retorno acumulado esperado. La formulación clásica se apoya en procesos de decisión de Markov (MDP), que proporcionan un marco para representar estados, acciones, transiciones y recompensas [1]. En mercados eléctricos, esta estructura resulta pertinente porque las decisiones se toman bajo incertidumbre, dependen de información disponible en cada instante y pueden afectar a resultados posteriores.
+El aprendizaje por refuerzo aborda problemas en los que un agente observa información del entorno, selecciona acciones y recibe señales de recompensa con el objetivo de maximizar el retorno acumulado esperado. La formulación clásica se apoya en procesos de decisión de Markov (MDP), que proporcionan un marco para representar estados, acciones, transiciones y recompensas <a href="#ref-1">[1]</a>. En mercados eléctricos, esta estructura resulta pertinente porque las decisiones se toman bajo incertidumbre, dependen de información disponible en cada instante y pueden afectar a resultados posteriores.
 
-La literatura ha mostrado un crecimiento sostenido de aplicaciones de RL a estrategias de oferta, despacho, almacenamiento, arbitraje, gestión de activos y control de riesgo en mercados liberalizados [2], [3]. La transferencia desde un experimento académico a un sistema útil exige, no obstante, resolver varios problemas metodológicos: evitar fuga de información futura, representar con suficiente fidelidad las reglas del entorno, imponer restricciones técnicas y económicas y evaluar la política en periodos no utilizados durante el entrenamiento.
+La literatura ha mostrado un crecimiento sostenido de aplicaciones de RL a estrategias de oferta, despacho, almacenamiento, arbitraje, gestión de activos y control de riesgo en mercados liberalizados <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>. La transferencia desde un experimento académico a un sistema útil exige, no obstante, resolver varios problemas metodológicos: evitar fuga de información futura, representar con suficiente fidelidad las reglas del entorno, imponer restricciones técnicas y económicas y evaluar la política en periodos no utilizados durante el entrenamiento.
 
 Este informe organiza esos elementos con un objetivo práctico: disponer de un marco general para diseñar y evaluar aplicaciones de RL en mercados eléctricos. Para ello, cubre cuatro frentes: (i) formalizar el entorno de decisión y sus componentes; (ii) ordenar las principales familias de algoritmos y arquitecturas; (iii) identificar herramientas de implementación y simulación; y (iv) sintetizar criterios de evaluación y patrones de aplicación descritos en la literatura.
 
-## 2. Alcance y naturaleza de la revisión
+# 2. Alcance y naturaleza de la revisión
 
 El documento se plantea como una **revisión narrativa y técnica orientada al diseño**, no como una revisión sistemática. Se priorizan trabajos fundacionales de RL, artículos revisados por pares, publicaciones de software científico y documentación técnica relevante. Los ejemplos aplicados se utilizan para identificar patrones metodológicos recurrentes en problemas de oferta, control continuo, almacenamiento, generación renovable, gestión de activos y entornos multiagente.
 
@@ -28,7 +28,7 @@ Por tanto, las conclusiones deben leerse como una síntesis técnica, no como un
 
 El informe se ha elaborado a partir de literatura científica, documentación oficial y fuentes públicas.
 
-## 3. Fundamentos y diseño del entorno de aprendizaje por refuerzo
+# 3. Fundamentos y diseño del entorno de aprendizaje por refuerzo
 
 ## 3.1. Formulación como proceso de decisión secuencial
 
@@ -46,9 +46,9 @@ En trading eléctrico, la hipótesis de observabilidad completa rara vez es estr
 
 El estado operativo puede organizarse en cuatro bloques.
 
-**a) Contexto de mercado y variables exógenas.** Incluye precios observados, diferenciales entre mercados, profundidad o liquidez cuando esté disponible, previsiones de generación y demanda, meteorología, indisponibilidades y otras señales externas. Estas variables no son controladas por el agente, pero modifican el valor esperado de sus acciones.
+**a) Contexto de mercado y variables exógenas.** Incluye precios observados, señales de precio, profundidad o liquidez cuando esté disponible, previsiones de generación y demanda, meteorología, indisponibilidades y otras señales externas. Estas variables no son controladas por el agente, pero modifican el valor esperado de sus acciones.
 
-**b) Estado interno de la posición o del activo.** En un problema de trading sin activo físico puede incluir posición acumulada, energía pendiente, exposición por mercado o límites de compra y venta. Cuando existe almacenamiento o generación gestionable, se añaden variables como estado de carga, potencia disponible, rampas, costes marginales y restricciones técnicas.
+**b) Estado interno de la posición o del activo.** En un problema de trading sin activo físico puede incluir posición acumulada, energía pendiente, exposición acumulada o límites de actuación. Cuando existe almacenamiento o generación gestionable, se añaden variables como estado de carga, potencia disponible, rampas, costes marginales y restricciones técnicas.
 
 **c) Información de decisiones previas.** En problemas secuenciales puede ser necesario representar acciones ya ejecutadas, compromisos acumulados, capacidad disponible o exposición existente. Sin este bloque el agente puede tratar cada decisión como independiente aunque forme parte de una misma trayectoria.
 
@@ -74,7 +74,7 @@ La recompensa conecta el objetivo del problema con el comportamiento que aprende
 
 donde ΔJ representa el resultado incremental asociado al objetivo, *C_risk* un término de riesgo, *C_op* penalizaciones por acciones operativamente inviables y *C_cost* otros costes relevantes para el entorno modelado.
 
-Los términos incluidos deben tener una interpretación económica u operativa clara. Si se incorporan medidas de riesgo de cola, el Value at Risk (VaR) resume un cuantil de pérdidas, mientras que el Conditional Value at Risk (CVaR) cuantifica la pérdida media en la cola más desfavorable. El CVaR dispone de una formulación de optimización bien establecida [4] y ha sido utilizado en trabajos de decisión secuencial sensible al riesgo [5].
+Los términos incluidos deben tener una interpretación económica u operativa clara. Si se incorporan medidas de riesgo de cola, el Value at Risk (VaR) resume un cuantil de pérdidas, mientras que el Conditional Value at Risk (CVaR) cuantifica la pérdida media en la cola más desfavorable. El CVaR dispone de una formulación de optimización bien establecida <a href="#ref-4">[4]</a> y ha sido utilizado en trabajos de decisión secuencial sensible al riesgo <a href="#ref-5">[5]</a>.
 
 En algunos problemas resulta útil definir la recompensa de forma incremental respecto de una política de referencia. Este enfoque facilita atribuir la mejora al comportamiento aprendido y evita que el agente sea premiado por componentes del resultado que no dependen de sus decisiones.
 
@@ -84,7 +84,7 @@ Las restricciones pueden tratarse de tres maneras. La primera es penalizar viola
 
 Debe distinguirse entre la acción propuesta por la política y la acción finalmente ejecutada por el entorno. Esta trazabilidad es necesaria para auditar por qué una política obtiene un resultado determinado y para evitar que el agente aprenda a explotar errores de modelado.
 
-## 4. Algoritmos y arquitecturas relevantes
+# 4. Algoritmos y arquitecturas relevantes
 
 ## 4.1. Métodos basados en valor, política y actor–critic
 
@@ -122,7 +122,7 @@ El histórico operativo puede utilizarse para algo más que comparar resultados.
 
 DAgger reduce el error de distribución de la imitación supervisada agregando de manera iterativa estados visitados por la política y consultando la acción de un experto <a href="#ref-18">[18]</a>. GAIL aprende una política cuya distribución de trayectorias se aproxima a la de las demostraciones mediante un esquema adversarial <a href="#ref-19">[19]</a>, mientras que AIRL busca recuperar una función de recompensa más interpretable y transferible <a href="#ref-20">[20]</a>. En trading energético, estas técnicas son útiles principalmente como inicialización, restricción de soporte o benchmark; no sustituyen la evaluación económica fuera de muestra.
 
-## 5. Implementación técnica y herramientas
+# 5. Implementación técnica y herramientas
 
 ## 5.1. Interfaces de entorno
 
@@ -149,21 +149,21 @@ En la práctica, la elección del framework depende de la reproducibilidad que s
 
 Un entorno de RL para mercados eléctricos puede separarse conceptualmente en varias capas: **mercado**, **activo o estado interno**, **ejecución y resultado económico** y **datos exógenos**. La capa de mercado define las reglas relevantes para la decisión; la capa de activo aplica restricciones físicas cuando existen; la ejecución traduce la acción del agente en una consecuencia observable; y los datos exógenos aportan la información disponible en cada instante.
 
-ASSUME ofrece un marco abierto de simulación basada en agentes para mercados eléctricos e integra estrategias con aprendizaje por refuerzo [29]. Para modelado físico, PyPSA permite análisis y optimización de sistemas energéticos [30], pandapower facilita flujo de potencia y otras funciones de análisis de redes eléctricas [31], y MATPOWER continúa siendo una referencia abierta para estudios de flujo de potencia y *optimal power flow* [32]. Estas herramientas no son intercambiables: su utilidad depende de si el problema requiere representar reglas de mercado, restricciones físicas, interacción entre agentes o una combinación de estas capas.
+ASSUME ofrece un marco abierto de simulación basada en agentes para mercados eléctricos e integra estrategias con aprendizaje por refuerzo <a href="#ref-29">[29]</a>. Para modelado físico, PyPSA permite análisis y optimización de sistemas energéticos <a href="#ref-30">[30]</a>, pandapower facilita flujo de potencia y otras funciones de análisis de redes eléctricas <a href="#ref-31">[31]</a>, y MATPOWER continúa siendo una referencia abierta para estudios de flujo de potencia y *optimal power flow* <a href="#ref-32">[32]</a>. Estas herramientas no son intercambiables: su utilidad depende de si el problema requiere representar reglas de mercado, restricciones físicas, interacción entre agentes o una combinación de estas capas.
 
 Un simulador útil no necesita reproducir todo el sistema eléctrico. Debe incluir únicamente los mecanismos que afectan a las decisiones analizadas y documentar de forma explícita las simplificaciones adoptadas. Añadir componentes que no modifican el comportamiento del agente incrementa la complejidad sin mejorar necesariamente la validez del experimento.
 
-## 6. Datos, reglas de mercado y validez del entorno
+# 6. Datos, reglas de mercado y validez del entorno
 
 La calidad de un experimento de RL depende de que las observaciones reflejen la información disponible en el momento de la decisión. Los mercados eléctricos ofrecen distintas fuentes de datos públicos —por ejemplo, precios, resultados agregados, variables de demanda, generación o meteorología—, pero la cobertura y el nivel de detalle varían entre mercados y periodos. La existencia de información agregada no implica disponer de órdenes individuales, estrategias de participantes ni condiciones de ejecución completas.
 
 La resolución temporal del entorno debe responder al fenómeno que se desea estudiar y a la información realmente disponible. Elegir una granularidad más fina no mejora por sí sola el modelo si los datos o las reglas no permiten reconstruir de forma fiable las transiciones entre decisiones. Del mismo modo, cualquier transformación, previsión o variable derivada debe respetar el principio *point-in-time*.
 
-Las reglas de mercado también forman parte del entorno. Cuando cambian, pueden modificar el significado de una observación, una acción o una función de coste. Por ello, la versión de las reglas, los datos y la configuración del simulador deben registrarse junto con cada experimento [2], [3].
+Las reglas de mercado también forman parte del entorno. Cuando cambian, pueden modificar el significado de una observación, una acción o una función de coste. Por ello, la versión de las reglas, los datos y la configuración del simulador deben registrarse junto con cada experimento <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>.
 
-## 7. Patrones de aplicación observados en la literatura
+# 7. Patrones de aplicación observados en la literatura
 
-La literatura sobre RL en mercados eléctricos cubre problemas con objetivos y restricciones muy distintos. En lugar de asumir que existe una única formulación válida, resulta más útil identificar los patrones que se repiten entre aplicaciones [2], [3].
+La literatura sobre RL en mercados eléctricos cubre problemas con objetivos y restricciones muy distintos. En lugar de asumir que existe una única formulación válida, resulta más útil identificar los patrones que se repiten entre aplicaciones <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>.
 
 ## 7.1. Estrategias de oferta y acciones continuas
 
@@ -197,9 +197,9 @@ Cuando las decisiones de otros participantes alteran directamente el entorno obs
 | Decisiones continuas | Secuencia de acciones | Modelo de ejecución | Pruebas fuera de muestra y robustez |
 | Entornos multiagente | Acciones de varios participantes | Interacción y no estacionariedad | Estabilidad entre escenarios y semillas |
 
-No aparece un algoritmo dominante de forma general. Los trabajos revisados coinciden, en cambio, en la importancia de alinear observaciones, acciones, restricciones y evaluación con el problema representado [2], [3].
+No aparece un algoritmo dominante de forma general. Los trabajos revisados coinciden, en cambio, en la importancia de alinear observaciones, acciones, restricciones y evaluación con el problema representado <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>.
 
-## 8. Discusión: criterios de transferibilidad a un sistema de trading eléctrico
+# 8. Discusión: criterios de transferibilidad a un sistema de trading eléctrico
 
 ## 8.1. El entorno es parte del modelo
 
@@ -209,7 +209,7 @@ La fidelidad debe aumentar solo cuando el objetivo de la investigación y la dis
 
 ## 8.2. Dataset point-in-time y prevención de fuga de información
 
-La validez de un backtest depende de reconstruir qué información estaba disponible en cada decisión. Las previsiones deben conservar su fecha de emisión; los precios de mercados posteriores no pueden aparecer en observaciones anteriores; y las transformaciones estadísticas deben ajustarse únicamente con el periodo de entrenamiento. Este principio afecta también a selección de hiperparámetros: el conjunto de test final debe permanecer aislado hasta que la política y las decisiones de diseño estén cerradas.
+La validez de un backtest depende de reconstruir qué información estaba disponible en cada decisión. Las previsiones deben conservar su fecha de emisión; las variables futuras no pueden aparecer en observaciones anteriores; y las transformaciones estadísticas deben ajustarse únicamente con el periodo de entrenamiento. Este principio afecta también a selección de hiperparámetros: el conjunto de test final debe permanecer aislado hasta que la política y las decisiones de diseño estén cerradas.
 
 Un esquema recomendable es entrenamiento → validación temporal para selección → test final fuera de muestra. Para entornos no estacionarios puede añadirse evaluación *walk-forward*. La repetición con varias semillas aleatorias permite distinguir mejoras robustas de resultados dependientes de inicialización.
 
@@ -231,7 +231,7 @@ Un sistema destinado a investigación reproducible o soporte a la decisión debe
 
 La monitorización en producción debería diferenciar *drift* de datos, degradación de desempeño y cambio regulatorio. En mercados eléctricos, una modificación de reglas puede alterar el significado de una variable o la forma de liquidación, por lo que la actualización del entorno es tan importante como el reentrenamiento del agente.
 
-## 9. Conclusiones
+# 9. Conclusiones
 
 El aprendizaje por refuerzo proporciona un marco coherente para estudiar decisiones secuenciales en mercados eléctricos, pero la literatura no respalda la idea de que exista un algoritmo universalmente superior. Las aplicaciones revisadas muestran que el resultado depende de cómo se representan la información, las acciones disponibles, las restricciones y las consecuencias económicas.
 
@@ -241,7 +241,7 @@ La evaluación debe partir de datos *point-in-time*, divisiones temporales estri
 
 En este contexto, RL es una herramienta útil para investigación y apoyo a la decisión cuando se acompaña de un diseño experimental reproducible y de una delimitación clara de los supuestos. El principal riesgo metodológico sigue siendo optimizar una representación incompleta del problema en lugar de aprender una política que generalice.
 
-## Referencias
+# Referencias
 
 <a id="ref-1"></a>[1] R. S. Sutton and A. G. Barto, *Reinforcement Learning: An Introduction*, 2nd ed. Cambridge, MA, USA: MIT Press, 2018.
 
