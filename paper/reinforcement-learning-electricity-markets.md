@@ -161,45 +161,123 @@ La resolución temporal del entorno debe responder al fenómeno que se desea est
 
 Las reglas de mercado también forman parte del entorno. Cuando cambian, pueden modificar el significado de una observación, una acción o una función de coste. Por ello, la versión de las reglas, los datos y la configuración del simulador deben registrarse junto con cada experimento <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>.
 
-# 7. Patrones de aplicación observados en la literatura
+# 7. Casos publicados en mercados eléctricos y trading
 
-La literatura sobre RL en mercados eléctricos cubre problemas con objetivos y restricciones muy distintos. En lugar de asumir que existe una única formulación válida, resulta más útil identificar los patrones que se repiten entre aplicaciones <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>.
+Los siguientes trabajos se incluyen porque representan formulaciones relevantes dentro de la literatura reciente: estrategias de oferta, acciones continuas, operación multi-mercado, almacenamiento, generación renovable y simulación multiagente. Cada caso se resume de forma independiente y únicamente en los términos descritos por sus autores; la selección no implica una arquitectura conjunta ni una propuesta de implementación concreta.
 
-## 7.1. Estrategias de oferta y acciones continuas
+## 7.1. Curvas de oferta precio-cantidad con DDPG
 
-Una parte de los trabajos utiliza políticas que seleccionan precios, cantidades o parámetros de una estrategia de oferta. Cuando la acción es continua o multidimensional, los métodos actor–critic permiten representar decisiones más ricas que una clasificación discreta. La validez del resultado depende de que el entorno modele de forma coherente la relación entre acción, ejecución y resultado económico.
+**Referencia principal:** Di Persio, Garbelli y Giordano, *Energy Economics* (2025) <a href="#ref-33">[33]</a>.
 
-## 7.2. Almacenamiento y activos flexibles
+**Objetivo.** El estudio plantea la generación de curvas de oferta escalonadas precio-cantidad para un participante en el mercado *day-ahead*, con el objetivo de maximizar el beneficio bajo restricciones de producción.
 
-Los problemas con almacenamiento o flexibilidad incorporan un estado interno que condiciona las acciones futuras. Variables como capacidad disponible, límites de potencia, eficiencia o costes de operación introducen dependencia temporal y hacen necesario representar de forma explícita las restricciones físicas. En estos casos, la política no puede evaluarse únicamente por el resultado inmediato de cada decisión.
+**Enfoque.** Los autores utilizan DDPG, un método actor-critic de acción continua. La elección responde a que la acción no es una decisión binaria, sino un vector multidimensional que representa una curva de oferta completa <a href="#ref-33">[33]</a>.
 
-## 7.3. Generación renovable e incertidumbre
+**Estado e información de entrada.** El modelo utiliza información histórica de precios del mercado eléctrico italiano junto con parámetros relacionados con costes y capacidad de producción.
 
-Las aplicaciones con generación renovable combinan decisiones de mercado con previsiones imperfectas de producción. La calidad de las previsiones, su fecha de emisión y la forma en que la incertidumbre entra en el estado son tan importantes como el algoritmo de RL. Un backtest que utilice información actualizada retrospectivamente puede sobreestimar de forma significativa el rendimiento.
+**Acción.** La política genera una curva de oferta escalonada precio-cantidad.
 
-## 7.4. Decisiones continuas y modelado de ejecución
+**Restricciones.** La acción debe respetar los límites de producción y la estructura admitida para la oferta.
 
-En problemas de decisión repetida, el entorno debe especificar qué significa ejecutar una acción y cómo se calcula su consecuencia. Si la simulación utiliza precios observados sin representar mecanismos de ejecución, esta simplificación debe documentarse y limitar el alcance de las conclusiones. Incluir mayor detalle solo es útil cuando existen datos suficientes para sostenerlo.
+**Reward.** La recompensa se deriva del beneficio generado por la estrategia. El resultado se normaliza respecto a un máximo teórico definido bajo las hipótesis del experimento.
 
-## 7.5. Entornos multiagente
+**Evaluación y resultados.** Los autores reportan valores de hasta aproximadamente un 85 % de recompensa normalizada en los experimentos presentados <a href="#ref-33">[33]</a>.
 
-Cuando las decisiones de otros participantes alteran directamente el entorno observado, el problema puede formularse como aprendizaje multiagente o combinar RL con simulación basada en agentes. Este enfoque permite estudiar interacción estratégica, pero introduce no estacionariedad y aumenta considerablemente la dificultad de entrenamiento y evaluación.
+**Conclusión metodológica.** El trabajo demuestra que una acción precio-cantidad estructurada puede abordarse mediante control continuo. También pone de relieve que la validez del resultado depende de representar explícitamente el mecanismo que transforma una oferta en energía ejecutada y resultado económico.
 
-## 7.6. Síntesis comparativa
+## 7.2. BESS multi-mercado y representación temporal
 
-**Tabla 2. Patrones de aplicación y requisitos de modelado**
+**Referencia principal:** Li, Wang, Zhang y Wang, *IEEE Transactions on Energy Markets, Policy and Regulation* (2024) <a href="#ref-34">[34]</a>.
 
-| Área de aplicación | Tipo de decisión | Reto principal de modelado | Requisito de evaluación |
-|---|---|---|---|
-| Estrategias de oferta | Discreta, continua o estructurada | Relación entre acción y ejecución | Comparación con baselines y sensibilidad a supuestos |
-| Almacenamiento y flexibilidad | Control continuo | Estado interno y restricciones físicas | Rendimiento acumulado y factibilidad |
-| Generación renovable | Decisión bajo incertidumbre | Previsiones y disponibilidad *point-in-time* | Separación temporal estricta |
-| Decisiones continuas | Secuencia de acciones | Modelo de ejecución | Pruebas fuera de muestra y robustez |
-| Entornos multiagente | Acciones de varios participantes | Interacción y no estacionariedad | Estabilidad entre escenarios y semillas |
+**Objetivo.** El trabajo estudia la participación conjunta de un sistema de almacenamiento en batería (BESS) en el mercado *spot* y en servicios australianos de reserva de contingencia.
 
-No aparece un algoritmo dominante de forma general. Los trabajos revisados coinciden, en cambio, en la importancia de alinear observaciones, acciones, restricciones y evaluación con el problema representado <a href="#ref-2">[2]</a>, <a href="#ref-3">[3]</a>.
+**Arquitectura.** El método TempDRL combina un extractor temporal basado en Transformer con un agente Soft Actor-Critic (SAC) para decisiones continuas <a href="#ref-34">[34]</a>.
 
-# 8. Discusión: criterios de transferibilidad a un sistema de trading eléctrico
+**Estado.** La observación incorpora precios de varios mercados, una representación temporal aprendida y el estado de carga del BESS.
+
+**Acción.** El agente toma decisiones continuas de *bidding* y asignación de capacidad entre los distintos servicios considerados.
+
+**Restricciones.** El entorno incorpora límites de capacidad y potencia, además de la compatibilidad entre la energía comprometida en diferentes servicios.
+
+**Reward.** La recompensa agrega los ingresos procedentes de las distintas vías de mercado e incorpora las consecuencias operativas de las decisiones sobre el almacenamiento.
+
+**Datos y evaluación.** El estudio emplea precios del Australian National Electricity Market y compara el método con estrategias basadas en optimización y con otros enfoques DRL. Los resultados reportados muestran ventajas de la participación conjunta frente al tratamiento aislado de los mercados en los escenarios estudiados <a href="#ref-34">[34]</a>.
+
+**Conclusión metodológica.** En problemas con almacenamiento, el estado interno del activo condiciona las decisiones futuras y genera costes de oportunidad entre servicios. Las arquitecturas temporales pueden aportar valor, pero su beneficio debe comprobarse frente a modelos más sencillos.
+
+## 7.3. Renovables con almacenamiento en varios mercados
+
+**Referencia principal:** Cardo-Miota *et al.*, *Applied Energy* (2025) <a href="#ref-35">[35]</a>.
+
+**Objetivo.** El estudio busca maximizar los ingresos de un sistema renovable con batería mediante participación simultánea en un mercado *day-ahead* y en servicios de reserva del programa DS3 irlandés.
+
+**Enfoque.** El problema se formula como un MDP y se utiliza TD3 como algoritmo actor-critic para acción continua <a href="#ref-35">[35]</a>.
+
+**Estado.** La observación combina señales de mercado, producción renovable y estado del almacenamiento.
+
+**Datos.** El caso de estudio utiliza datos históricos de una planta fotovoltaica de 7 MW y un BESS de 1 MWh <a href="#ref-35">[35]</a>.
+
+**Acción.** La política toma decisiones continuas sobre el uso del almacenamiento y la participación en los servicios considerados.
+
+**Restricciones.** Se modelan capacidad, potencia, estado de carga y compatibilidad con los servicios de mercado.
+
+**Reward.** La recompensa representa el resultado económico agregado de la operación, sujeto a las restricciones físicas del activo.
+
+**Evaluación.** Los autores comparan el agente con estrategias de referencia y reportan beneficios económicos adicionales en los escenarios evaluados <a href="#ref-35">[35]</a>.
+
+**Conclusión metodológica.** Las restricciones físicas deben formar parte del entorno y de la dinámica de transición. En problemas con varias fuentes de ingreso, desagregar los resultados por componente ayuda a determinar de dónde procede una mejora observada.
+
+## 7.4. Trading continuo de generación fotovoltaica bajo incertidumbre
+
+**Referencia principal:** Abate, Liu, Liu y Zhang (2025) <a href="#ref-36">[36]</a>.
+
+**Objetivo.** El estudio analiza trading intradiario continuo para una planta fotovoltaica bajo incertidumbre de generación y precios, considerando conjuntamente el resultado de trading y la exposición a desbalances.
+
+**Algoritmo.** Los autores utilizan PPO con una política diseñada para conservar interpretabilidad <a href="#ref-36">[36]</a>.
+
+**Estado.** La observación combina variables de mercado, información histórica, señales de microestructura y variables relacionadas con la producción y sus previsiones.
+
+**Acción.** La estrategia se ajusta secuencialmente a medida que cambia la información disponible.
+
+**Reward.** La recompensa combina el resultado del trading con una penalización asociada al desbalance, evitando que el agente optimice únicamente el beneficio bruto de las operaciones.
+
+**Evaluación.** El entrenamiento utiliza datos históricos y la evaluación se realiza fuera de muestra. El trabajo reporta mejoras frente a los benchmarks considerados en los escenarios analizados <a href="#ref-36">[36]</a>.
+
+**Conclusión metodológica.** El caso muestra la importancia de que la recompensa represente todas las consecuencias económicas relevantes de una decisión y de mantener una separación temporal estricta entre entrenamiento y evaluación. La interpretabilidad de la política puede facilitar además el análisis posterior de su comportamiento.
+
+## 7.5. Simulación multiagente y mercados locales
+
+**Referencia principal:** Bâra y Oprea, *Systems Research and Behavioral Science* (2026) <a href="#ref-37">[37]</a>.
+
+**Objetivo.** El trabajo modela trading en mercados eléctricos locales con prosumidores heterogéneos e integra generación, consumo flexible, vehículos eléctricos y calefacción.
+
+**Arquitectura.** La simulación combina Mesa para el modelado basado en agentes, PyMarket para el mecanismo de mercado y PPO de Stable-Baselines3 como política de *bidding* <a href="#ref-37">[37]</a>. Esta configuración separa la simulación del ecosistema de agentes de la optimización de las decisiones mediante RL.
+
+**Estrategias comparadas.** En una estrategia el agente determina principalmente el precio de puja; en otra optimiza precio y cantidad y coordina flexibilidad de cargas <a href="#ref-37">[37]</a>.
+
+**Datos y simulación.** El estudio utiliza una comunidad de 114 hogares, datos de consumo a resolución de 15 minutos y una simulación anual con varios mecanismos de mercado local <a href="#ref-37">[37]</a>.
+
+**Reward.** La recompensa se calcula a partir del resultado obtenido después del *clearing* de mercado y guía la política hacia mejores decisiones de *bidding*.
+
+**Métricas y resultados.** Los autores emplean indicadores de comunidad y ahorro financiero. En los escenarios reportados, la estrategia que incorpora precio, cantidad y flexibilidad supera a la alternativa más simple; por ejemplo, el ahorro financiero pasa del 11,58 % al 17,88 % en verano y del 4,21 % al 5,38 % en invierno <a href="#ref-37">[37]</a>.
+
+**Conclusión metodológica.** El estudio es útil para analizar cómo la interacción entre participantes, el mecanismo de *clearing* y la flexibilidad modifican el entorno de decisión. Sus resultados deben interpretarse dentro de las reglas y la escala específicas del mercado simulado.
+
+## 7.6. Síntesis comparativa de los casos
+
+**Tabla 2. Casos publicados y elementos metodológicos**
+
+| Estudio | Contexto publicado | Algoritmo | Acción | Elemento metodológico |
+|---|---|---|---|---|
+| Di Persio *et al.* <a href="#ref-33">[33]</a> | *Day-ahead*, generación | DDPG | Curva precio-cantidad | Acción continua estructurada y modelado de ejecución |
+| Li *et al.* <a href="#ref-34">[34]</a> | BESS en varios servicios | SAC + Transformer | Continua multi-mercado | Estado temporal, SoC y coste de oportunidad |
+| Cardo-Miota *et al.* <a href="#ref-35">[35]</a> | Renovable + BESS | TD3 | Operación continua | Restricciones físicas dentro del entorno |
+| Abate *et al.* <a href="#ref-36">[36]</a> | PV y trading continuo | PPO | Ajuste secuencial | Reward completo y evaluación fuera de muestra |
+| Bâra y Oprea <a href="#ref-37">[37]</a> | Mercado local | ABM + PPO | Precio, cantidad y flexibilidad | Clearing e interacción estratégica |
+
+Los cinco estudios utilizan formulaciones diferentes y no permiten identificar un algoritmo universalmente dominante. Sí comparten varios requisitos metodológicos: observaciones consistentes con la información realmente disponible, acciones coherentes con el mecanismo representado, restricciones explícitas, una recompensa alineada con el objetivo evaluado, simulación suficiente para interpretar la acción y validación fuera de muestra frente a referencias adecuadas.
+
+# 8. Discusión: criterios metodológicos de diseño y evaluación
 
 ## 8.1. El entorno es parte del modelo
 
@@ -221,7 +299,7 @@ Cuando el agente cambia radicalmente el volumen negociado, una métrica de resul
 
 ## 8.4. Selección de algoritmo
 
-Para una primera implementación con acciones continuas y un simulador estable, PPO, TD3 y SAC son candidatos razonables, pero responden a regímenes de datos distintos. PPO es simple y robusto en muchos entornos, aunque consume experiencia *on-policy*. TD3 y SAC reutilizan experiencia y suelen ser más eficientes en muestras. Si el proyecto dispone únicamente de un dataset fijo de transiciones y no de un simulador interactivo, CQL o IQL son opciones conceptualmente más adecuadas para offline RL <a href="#ref-13">[13]</a>, <a href="#ref-14">[14]</a>.
+Para una primera implementación con acciones continuas y un simulador estable, PPO, TD3 y SAC son candidatos razonables, pero responden a regímenes de datos distintos. PPO es simple y robusto en muchos entornos, aunque consume experiencia *on-policy*. TD3 y SAC reutilizan experiencia y suelen ser más eficientes en muestras. Si únicamente se dispone de un dataset fijo de transiciones y no de un simulador interactivo, CQL o IQL son opciones conceptualmente más adecuadas para offline RL <a href="#ref-13">[13]</a>, <a href="#ref-14">[14]</a>.
 
 La selección debe realizarse mediante un protocolo común: mismo periodo de datos, mismas observaciones, mismas restricciones, misma función de recompensa, presupuesto de entrenamiento comparable y evaluación fuera de muestra. De lo contrario, atribuir la diferencia al algoritmo carece de validez experimental.
 
@@ -306,3 +384,13 @@ En este contexto, RL es una herramienta útil para investigación y apoyo a la d
 <a id="ref-31"></a>[31] L. Thurner *et al.*, “pandapower—An Open-Source Python Tool for Convenient Modeling, Analysis, and Optimization of Electric Power Systems,” *IEEE Transactions on Power Systems*, vol. 33, no. 6, pp. 6510–6521, 2018, doi: [10.1109/TPWRS.2018.2829021](https://doi.org/10.1109/TPWRS.2018.2829021).
 
 <a id="ref-32"></a>[32] R. D. Zimmerman, C. E. Murillo-Sánchez, and R. J. Thomas, “MATPOWER: Steady-State Operations, Planning, and Analysis Tools for Power Systems Research and Education,” *IEEE Transactions on Power Systems*, vol. 26, no. 1, pp. 12–19, 2011, doi: [10.1109/TPWRS.2010.2051168](https://doi.org/10.1109/TPWRS.2010.2051168).
+
+<a id="ref-33"></a>[33] L. Di Persio, M. Garbelli, and L. M. Giordano, “Reinforcement learning for bidding strategy optimization in day-ahead energy market,” *Energy Economics*, vol. 149, art. 108673, 2025, doi: [10.1016/j.eneco.2025.108673](https://doi.org/10.1016/j.eneco.2025.108673).
+
+<a id="ref-34"></a>[34] J. Li, C. Wang, Y. Zhang, and H. Wang, “Temporal-Aware Deep Reinforcement Learning for Energy Storage Bidding in Energy and Contingency Reserve Markets,” *IEEE Transactions on Energy Markets, Policy and Regulation*, vol. 2, no. 3, pp. 392–406, 2024, doi: [10.1109/TEMPR.2024.3372656](https://doi.org/10.1109/TEMPR.2024.3372656).
+
+<a id="ref-35"></a>[35] J. Cardo-Miota, H. Beltran, E. Pérez, S. Khadem, and M. Bahloul, “Deep reinforcement learning-based strategy for maximizing returns from renewable energy and energy storage systems in multi-electricity markets,” *Applied Energy*, vol. 388, art. 125561, 2025, doi: [10.1016/j.apenergy.2025.125561](https://doi.org/10.1016/j.apenergy.2025.125561).
+
+<a id="ref-36"></a>[36] A. G. Abate, X. Liu, R. Liu, and X.-B. Zhang, “Feature-driven reinforcement learning for photovoltaic in continuous intraday trading,” arXiv:2510.16021, 2025, doi: [10.48550/arXiv.2510.16021](https://doi.org/10.48550/arXiv.2510.16021).
+
+<a id="ref-37"></a>[37] A. Bâra and S.-V. Oprea, “Trading Strategies on Local Electricity Markets Using Agent-Based Modelling and Reinforcement Learning: Vectors to Expand Energy Communities,” *Systems Research and Behavioral Science*, vol. 43, no. 3, pp. 1188–1211, 2026, doi: [10.1002/sres.70017](https://doi.org/10.1002/sres.70017).
