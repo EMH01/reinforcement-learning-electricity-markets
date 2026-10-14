@@ -23,11 +23,9 @@ The review covers:
 - temporal backtesting, baselines, risk metrics, and reproducibility
 - implications for the Iberian electricity market
 
-## Public-scope statement
+## Sources and scope
 
-This public version is based exclusively on **scientific literature, official documentation, and open sources**.
-
-It contains **no client or company data, proprietary code, business rules, private parameters, internal metrics, confidential architectures, or non-public results**. The research is presented as a general methodological study independent of any specific commercial implementation.
+The report is based on **scientific literature, official documentation, and public sources**.
 
 ## Why this matters
 
@@ -41,7 +39,7 @@ The central research question of this work is therefore:
 
 This research review is **complete for its intended scope**: identifying and organizing the methodological, algorithmic, simulation, evaluation, and market-design considerations needed to reason about reinforcement learning for electricity-market trading.
 
-It does **not** claim an original production trading strategy, a client-derived empirical result, or an experimental benchmark.
+It does **not** claim an original production trading strategy or an experimental benchmark.
 
 Version 1.0 closes the research scope covered by this repository. Future changes, if any, are expected to be limited to corrections, reference maintenance, or publication metadata rather than an expansion of the investigation.
 
