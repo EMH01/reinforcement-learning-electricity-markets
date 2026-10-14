@@ -6,7 +6,7 @@
 
 ## Resumen
 
-La creciente penetración de generación renovable, la volatilidad de los precios y la sucesión de mercados con distintos horizontes temporales convierten la operación eléctrica en un problema de decisión secuencial bajo incertidumbre. El aprendizaje por refuerzo (*reinforcement learning*, RL) ofrece un marco formal para aprender políticas de decisión a partir de la interacción con un entorno, pero su utilidad práctica en trading eléctrico depende menos de la elección aislada de un algoritmo que de la fidelidad del entorno, la definición de la información disponible en cada instante, el diseño de la función de recompensa y la evaluación fuera de muestra. Este trabajo presenta una revisión narrativa y técnica de los elementos necesarios para diseñar sistemas de RL aplicados a mercados eléctricos. Se sintetizan la formulación del problema mediante procesos de decisión de Markov, los espacios de estado y acción, el diseño de recompensas y restricciones, las principales familias de algoritmos —incluidos PPO, DDPG, TD3, SAC y métodos de RL offline— y las herramientas de implementación y simulación más relevantes. Asimismo, se analizan cinco estudios recientes sobre construcción de curvas de oferta, almacenamiento multi-mercado, generación renovable con baterías, trading intradiario continuo y mercados locales multiagente. Finalmente, se discuten las implicaciones para el mercado ibérico, donde la granularidad cuarto-horaria, la liquidación de desvíos y la disponibilidad de información pública de mercado condicionan tanto el estado observable como la recompensa. La evidencia revisada respalda el RL como metodología prometedora, pero no sustituye la necesidad de un backtesting temporal riguroso, baselines sólidos, control de riesgo y validación de la factibilidad operativa.
+La creciente penetración de generación renovable, la volatilidad de los precios y la sucesión de mercados con distintos horizontes temporales convierten la operación eléctrica en un problema de decisión secuencial bajo incertidumbre. El aprendizaje por refuerzo (*reinforcement learning*, RL) ofrece un marco formal para aprender políticas de decisión a partir de la interacción con un entorno. En trading eléctrico, sin embargo, su utilidad depende menos de elegir un algoritmo concreto que de representar bien el mercado, limitar la información a la disponible en cada instante, definir una recompensa con sentido económico y evaluar fuera de muestra. Este informe revisa los elementos necesarios para diseñar sistemas de RL aplicados a mercados eléctricos: formulación mediante procesos de decisión de Markov, espacios de estado y acción, recompensas y restricciones, principales familias de algoritmos —PPO, DDPG, TD3, SAC y métodos de RL offline— y herramientas de implementación y simulación. Se examinan además cinco estudios recientes sobre curvas de oferta, almacenamiento multi-mercado, generación renovable con baterías, trading intradiario continuo y mercados locales multiagente. El análisis se completa con las particularidades del mercado ibérico, donde la granularidad cuarto-horaria, la liquidación de desvíos y la disponibilidad de información pública condicionan tanto el estado observable como la recompensa. La literatura revisada muestra que RL puede ser útil en este dominio, pero también que un backtesting temporal riguroso, baselines sólidos, control de riesgo y validación de la factibilidad operativa son condiciones necesarias para interpretar los resultados.
 
 **Palabras clave:** aprendizaje por refuerzo; mercados eléctricos; trading energético; PPO; actor–critic; desvíos; mercado intradiario; backtesting.
 
@@ -16,17 +16,17 @@ El aprendizaje por refuerzo aborda problemas en los que un agente observa inform
 
 La literatura ha mostrado un crecimiento sostenido de aplicaciones de RL a estrategias de oferta, despacho, almacenamiento, arbitraje y gestión de riesgo en mercados liberalizados [2], [3]. Sin embargo, la transferencia desde un experimento académico a una herramienta operativa exige resolver varios problemas metodológicos: evitar fuga de información futura, representar de forma realista las reglas de mercado, imponer límites técnicos y comerciales, modelar costes de desbalance y evaluar la política en periodos no utilizados durante el entrenamiento.
 
-El objetivo de este artículo es organizar esos elementos en una estructura útil para el diseño de un sistema de trading energético basado en RL. Se persiguen cuatro objetivos específicos: (i) formalizar el entorno de decisión y sus componentes; (ii) ordenar las familias de algoritmos y arquitecturas según el tipo de problema; (iii) identificar herramientas de implementación y simulación pertinentes; y (iv) sintetizar evidencia aplicada reciente y discutir su transferibilidad al mercado eléctrico ibérico.
+Este informe organiza esos elementos con un objetivo práctico: disponer de un marco para diseñar y evaluar un sistema de trading energético basado en RL. Para ello, cubre cuatro frentes: (i) formalizar el entorno de decisión y sus componentes; (ii) ordenar las familias de algoritmos y arquitecturas según el tipo de problema; (iii) identificar herramientas de implementación y simulación pertinentes; y (iv) sintetizar evidencia aplicada reciente y discutir su transferibilidad al mercado eléctrico ibérico.
 
 ## 2. Alcance y naturaleza de la revisión
 
 El documento se plantea como una **revisión narrativa y técnica orientada al diseño**, no como una revisión sistemática. Se priorizan trabajos fundacionales de RL, artículos revisados por pares, publicaciones de software científico y documentación oficial de operadores o reguladores. Los ejemplos aplicados se seleccionan por su cercanía a problemas de trading eléctrico: construcción de ofertas, acciones continuas, operación multi-mercado, almacenamiento, desvíos, intradiario continuo y entornos multiagente.
 
-Esta elección metodológica tiene dos consecuencias. Primero, las conclusiones deben interpretarse como una síntesis técnica y no como un metaanálisis exhaustivo de toda la literatura. Segundo, cuando una fuente describe una herramienta o un mercado concreto, se utiliza para respaldar esa afirmación específica, evitando extrapolar resultados de un entorno experimental a otro sin justificación.
+Por tanto, las conclusiones deben leerse como una síntesis técnica, no como un metaanálisis exhaustivo de toda la literatura. Cada fuente se utiliza para respaldar la afirmación concreta a la que se refiere, sin extrapolar resultados de un entorno experimental a otro cuando no hay base para hacerlo.
 
-### 2.1. Declaración de independencia y alcance público
+### 2.1. Fuentes y alcance
 
-Esta versión pública se basa exclusivamente en literatura científica, documentación oficial y fuentes abiertas. No incorpora datos, código, reglas de negocio, parámetros, métricas, arquitecturas, resultados ni otra información confidencial o propietaria de empresas o clientes. Cualquier posible motivación profesional previa queda abstraída aquí a un problema general de investigación y diseño metodológico.
+El informe se ha elaborado a partir de literatura científica, documentación oficial y fuentes públicas.
 
 ## 3. Fundamentos y diseño del entorno de aprendizaje por refuerzo
 
@@ -68,7 +68,7 @@ Una tercera alternativa es la **acción estructurada**, por ejemplo un vector de
 
 ### 3.4. Función de recompensa
 
-La recompensa es el vínculo entre el objetivo económico u operacional y el comportamiento aprendido. Una formulación genérica para trading eléctrico puede escribirse como:
+La recompensa es el vínculo entre el objetivo económico u operativo y el comportamiento aprendido. Una formulación genérica para trading eléctrico puede escribirse como:
 
 **r_t = ΔPnL_t − λ_imb C_imb,t − λ_risk C_risk,t − λ_op C_op,t,**
 
@@ -143,7 +143,7 @@ Esta separación permite cambiar el algoritmo sin reescribir la lógica de merca
 | TorchRL | Componentes RL dentro de PyTorch | Apropiado para pipelines personalizados, datasets y objetivos de RL [27]. |
 | Tianshou | Colección modular de algoritmos | Ofrece componentes reutilizables y soporte para múltiples paradigmas [28]. |
 
-La elección de framework debe basarse en reproducibilidad, soporte del algoritmo, trazabilidad de experimentos y facilidad de integración. Afirmaciones de que una librería es “la opción definitiva” o “el estándar” deberían evitarse salvo que exista un criterio objetivo y explícito.
+En la práctica, la elección del framework depende de la reproducibilidad que se necesite, los algoritmos disponibles, la trazabilidad de los experimentos y la facilidad de integración con el resto del sistema.
 
 ### 5.3. Simulación de mercado, activos y red
 
@@ -169,25 +169,25 @@ Desde el punto de vista de RL, estas reglas implican que el coste del desvío no
 
 Di Persio, Garbelli y Giordano proponen un enfoque con DDPG para generar curvas escalonadas de oferta en un mercado diario utilizando datos históricos del mercado eléctrico italiano [35]. El interés metodológico del trabajo reside en que la acción no es una simple señal de compra o venta, sino una decisión continua y multidimensional que representa una curva de oferta. Los autores reportan hasta aproximadamente un 85 % de recompensa normalizada en sus experimentos, definida respecto a un máximo teórico bajo sus hipótesis [35].
 
-La lección transferible es doble. Primero, una acción precio–cantidad puede aprenderse con actor–critic continuo. Segundo, la calidad del resultado depende de que el entorno represente cómo la oferta se transforma en energía casada y beneficio; sin esa relación, la política optimiza una abstracción que puede no corresponder al mecanismo de mercado real.
+El trabajo muestra que una acción precio–cantidad puede aprenderse con actor–critic continuo. Al mismo tiempo, pone de relieve que el resultado solo es interpretable si el entorno representa cómo la oferta se transforma en energía casada y beneficio; de lo contrario, la política termina optimizando una abstracción del mercado.
 
 ### 7.2. Almacenamiento multi-mercado con información temporal
 
 Li *et al.* presentan TempDRL, un enfoque para participación de baterías en mercado spot y mercados de reserva de contingencia del National Electricity Market australiano [36]. El sistema combina un extractor temporal basado en Transformer con un agente de RL y se valida con precios reales. El estudio reporta mejoras frente a baselines de optimización y DRL, y muestra que la participación conjunta puede generar más valor que tratar los mercados de forma aislada [36].
 
-Este caso ilustra la importancia de incorporar el estado interno del activo —especialmente el SoC— y de reconocer que vender capacidad en un servicio restringe decisiones futuras. También evidencia que una representación temporal rica puede aportar valor cuando existen dependencias persistentes en precios, aunque esa ganancia debe demostrarse experimentalmente frente a modelos más simples.
+Para un entorno con almacenamiento, el punto clave es que el SoC y las decisiones ya tomadas formen parte del estado: comprometer capacidad en un servicio limita lo que puede hacerse después. Una representación temporal más rica puede ayudar cuando existen dependencias persistentes en precios, pero esa mejora debe comprobarse frente a modelos más sencillos.
 
 ### 7.3. Renovables y almacenamiento en múltiples mercados
 
 Cardo-Miota *et al.* formulan la operación conjunta de un sistema renovable con batería como un MDP y aplican TD3 a la participación en mercado day-ahead y servicios de reserva del programa DS3 en Irlanda [37]. El caso utiliza datos históricos de una planta fotovoltaica de 7 MW y una batería de 1 MWh. Los autores reportan beneficios económicos adicionales frente a estrategias de referencia en los escenarios evaluados [37].
 
-La principal aportación para otros proyectos es la integración de restricciones físicas y mercados múltiples dentro del mismo problema de decisión. La comparación con baselines y la separación entre ingresos por mercado son esenciales para determinar si la mejora procede realmente de la política o de supuestos favorables del entorno.
+El interés para otros casos está en integrar restricciones físicas y participación en varios mercados dentro del mismo problema de decisión. Separar los ingresos por mercado y comparar con baselines permite comprobar si la mejora procede de la política y no de supuestos favorables del entorno.
 
 ### 7.4. Trading intradiario continuo para generación fotovoltaica
 
 Abate *et al.* plantean un agente PPO para trading intradiario continuo de generación fotovoltaica con una recompensa que combina resultado de trading y exposición a desbalances [38]. El trabajo utiliza información de mercado y previsiones dentro de un marco secuencial, incorpora un modelo de ejecución simplificado y evalúa la política fuera de muestra. La estrategia propuesta supera a los baselines considerados en los escenarios reportados, y el diseño enfatiza la interpretabilidad de la política [38].
 
-Este caso es especialmente próximo a un problema de ajuste de posición: la decisión no consiste únicamente en “comprar” o “vender”, sino en determinar volumen y condiciones de ejecución mientras la previsión de producción cambia. Metodológicamente, refuerza tres requisitos: reward relativo a un baseline, modelo de ejecución explícito y separación temporal estricta entre entrenamiento y evaluación.
+Este planteamiento se acerca especialmente a un problema de ajuste de posición: la decisión no consiste solo en “comprar” o “vender”, sino también en determinar volumen y condiciones de ejecución mientras cambia la previsión de producción. Para el diseño del entorno destacan tres requisitos: reward relativo a un baseline, modelo de ejecución explícito y separación temporal estricta entre entrenamiento y evaluación.
 
 ### 7.5. Mercados locales, ABM y aprendizaje multiagente
 
@@ -207,7 +207,7 @@ Su transferencia directa a un mercado mayorista como OMIE es limitada, porque el
 | Abate *et al.* [38] | Intradiario continuo, PV | PPO | Volumen / ejecución | Reward relativo a baseline, desvíos y validación temporal. |
 | Bâra y Oprea [39] | Mercado local, prosumidores | ABM + PPO | Precio, cantidad y flexibilidad | Interacción estratégica y clearing multiagente. |
 
-En conjunto, los trabajos no identifican un único algoritmo dominante. Lo que se repite es una combinación de acciones coherentes con la operativa, estado *point-in-time*, restricciones explícitas, simulación suficientemente realista y evaluación contra referencias.
+No aparece un algoritmo dominante entre los trabajos revisados. Sí aparece un patrón común: acciones coherentes con la operativa, estado *point-in-time*, restricciones explícitas, simulación suficientemente realista y evaluación contra referencias.
 
 ## 8. Discusión: criterios de transferibilidad a un sistema de trading eléctrico
 
@@ -215,7 +215,7 @@ En conjunto, los trabajos no identifican un único algoritmo dominante. Lo que s
 
 En RL, el entorno no es un mero generador de datos. Define qué consecuencias puede aprender la política. Si el entorno liquida todas las operaciones al precio histórico sin modelar ejecución, la política es esencialmente *price-taker*. Esta hipótesis puede ser válida para una primera prueba de concepto si se documenta, pero no permite concluir que una estrategia precio–cantidad funcionaría igual en producción.
 
-Una evolución razonable consiste en separar niveles de fidelidad. Un primer entorno puede validar la lógica secuencial de ajuste de posición y recompensa. Un segundo nivel puede incorporar precio límite o agresividad y una regla de casación basada en información histórica. Un tercer nivel, si el nivel de fidelidad requerido lo justifica y existen datos públicos adecuados, puede modelar libro de órdenes, impacto de mercado o interacción con otros agentes.
+Conviene, por tanto, trabajar por niveles de fidelidad. Un primer entorno puede validar la lógica secuencial de ajuste de posición y recompensa. Un segundo nivel puede incorporar precio límite o agresividad y una regla de casación basada en información histórica. Un tercer nivel, si el nivel de fidelidad requerido lo justifica y existen datos públicos adecuados, puede modelar libro de órdenes, impacto de mercado o interacción con otros agentes.
 
 ### 8.2. Dataset point-in-time y prevención de fuga de información
 
@@ -245,7 +245,7 @@ La monitorización en producción debería diferenciar *drift* de datos, degrada
 
 El aprendizaje por refuerzo proporciona un marco coherente para trading eléctrico porque representa explícitamente la secuencia de decisiones, el estado acumulado de la posición y las consecuencias económicas futuras. La literatura revisada muestra aplicaciones convincentes en ofertas day-ahead, almacenamiento multi-mercado, renovables con baterías, intradiario continuo y mercados locales. Sin embargo, esos resultados no justifican por sí solos la superioridad de RL frente a métodos tradicionales en cualquier contexto.
 
-La contribución crítica no reside únicamente en elegir PPO, SAC o TD3, sino en construir un entorno que reproduzca de forma defendible la información, restricciones, ejecución y liquidación del problema real. Un agente entrenado sobre un entorno con fuga de información, reglas de casación irreales o una recompensa mal especificada puede mostrar un backtest excelente y carecer de valor operativo.
+Los trabajos revisados apuntan a que el resultado depende tanto del entorno como del algoritmo. Elegir PPO, SAC o TD3 no compensa una representación deficiente de la información, las restricciones, la ejecución o la liquidación. Con fuga de información, reglas de casación irreales o una recompensa mal especificada, un backtest puede ser excelente y aun así carecer de valor operativo.
 
 Para el contexto ibérico, la disponibilidad de precios y curvas agregadas de OMIE, junto con la liquidación cuarto-horaria de desvíos, ofrece una base para construir entornos de investigación realistas [33], [34]. La línea de trabajo más sólida consiste en avanzar por niveles de fidelidad: comenzar con un agente *price-taker* que ajuste posiciones de forma secuencial, validar reward y backtesting, incorporar después una capa de ejecución precio–cantidad y, solo si los datos lo permiten, ampliar hacia simulación estratégica o multiagente.
 
