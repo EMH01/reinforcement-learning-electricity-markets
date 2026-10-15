@@ -171,193 +171,178 @@ Los siguientes trabajos se seleccionan porque representan problemas transferible
 
 ## 7.1. Ofertas estratégicas y generación de curvas de oferta en day-ahead
 
-**Referencia principal**  
-Di Persio, Garbelli y Giordano, *Energy Economics* (2025) [[35]](#ref-35).
+- **Referencia principal**  
+  Di Persio, Garbelli y Giordano, *Energy Economics* (2025) [[35]](#ref-35).
 
-**Objetivo**  
-Construir curvas de oferta escalonadas precio–cantidad para un participante en el mercado diario, maximizando el beneficio bajo restricciones de producción.
+- **Objetivo**  
+  Construir curvas de oferta escalonadas precio–cantidad para un participante en el mercado diario, maximizando el beneficio bajo restricciones de producción.
 
-**Enfoque**  
-El trabajo utiliza DDPG, un algoritmo actor–critic para acción continua, precisamente porque la curva de oferta se representa como un vector de alta dimensión. Esto conecta directamente con lo descrito en **3.3 — Espacio de acciones** y **4.1 — Métodos basados en valor, política y actor–critic**.
+- **Enfoque**  
+  El trabajo utiliza DDPG, un algoritmo actor–critic para acción continua, precisamente porque la curva de oferta se representa como un vector de alta dimensión. Esto conecta directamente con lo descrito en **3.3 — Espacio de acciones** y **4.1 — Métodos basados en valor, política y actor–critic**.
 
-**Estado / información de entrada**  
-El modelo utiliza información histórica de precios del mercado eléctrico italiano y parámetros relacionados con costes y capacidad para producir la curva de oferta.
+- **Estado / información de entrada**  
+  El modelo utiliza información histórica de precios del mercado eléctrico italiano y parámetros relacionados con costes y capacidad para producir la curva de oferta.
 
-**Acción**  
-Una curva de oferta escalonada, no una única decisión binaria.
+- **Acción**  
+  Una curva de oferta escalonada, no una única decisión binaria.
 
-**Restricciones**  
-La política debe respetar límites de producción y la estructura de la oferta.
+- **Restricciones**  
+  La política debe respetar límites de producción y la estructura de la oferta.
 
-**Reward**  
-Se basa en el beneficio generado por la estrategia. Los autores normalizan el resultado respecto a un máximo teórico definido bajo las hipótesis del experimento.
+- **Reward**  
+  Se basa en el beneficio generado por la estrategia. Los autores normalizan el resultado respecto a un máximo teórico definido bajo las hipótesis del experimento.
 
-**Evaluación y resultados**  
-El trabajo reporta hasta aproximadamente un 85 % de recompensa normalizada en sus experimentos [[35]](#ref-35).
+- **Evaluación y resultados**  
+  El trabajo reporta hasta aproximadamente un **85 % de recompensa normalizada** en sus experimentos [[35]](#ref-35).
 
-**Aprendizajes transferibles**
-
-- Las acciones precio–cantidad pueden representarse como control continuo.
-- El *bidding* estratégico necesita una capa explícita de casación.
-- Es útil separar una primera fase *price-taker* de una segunda fase donde el precio de la acción sí afecte a la ejecución.
+- **Aprendizajes transferibles**
+  - Las acciones precio–cantidad pueden representarse como control continuo.
+  - El *bidding* estratégico necesita una capa explícita de casación.
+  - Es útil separar una primera fase *price-taker* de una segunda fase donde el precio de la acción sí afecte a la ejecución.
 
 ## 7.2. Estrategias multi-mercado con BESS y aprendizaje temporal
 
-**Referencia principal**  
-Li, Wang, Zhang y Wang, *IEEE Transactions on Energy Markets, Policy and Regulation* (2024) [[36]](#ref-36).
+- **Referencia principal**  
+  Li, Wang, Zhang y Wang, *IEEE Transactions on Energy Markets, Policy and Regulation* (2024) [[36]](#ref-36).
 
-**Objetivo**  
-Optimizar conjuntamente la participación de un BESS en el mercado spot y en mercados australianos de contingencia FCAS.
+- **Objetivo**  
+  Optimizar conjuntamente la participación de un BESS en el mercado spot y en mercados australianos de contingencia FCAS.
 
-**Arquitectura**  
-El método TempDRL combina:
+- **Arquitectura**  
+  El método TempDRL combina:
+  - un *Transformer-based Temporal Feature Extractor* (TTFE);
+  - un agente Soft Actor-Critic (SAC) para el *bidding* continuo [[36]](#ref-36).
 
-- un *Transformer-based Temporal Feature Extractor* (TTFE);
-- un agente Soft Actor-Critic (SAC) para el *bidding* continuo [[36]](#ref-36).
+  Esto conecta con **4.3 — Arquitecturas neuronales y memoria temporal** y **4.1 — Métodos basados en valor, política y actor–critic**.
 
-Esto conecta con **4.3 — Arquitecturas neuronales y memoria temporal** y **4.1 — Métodos basados en valor, política y actor–critic**.
+- **Estado**
+  - precios de múltiples mercados;
+  - representación temporal extraída por el TTFE;
+  - estado de carga del BESS.
 
-**Estado**  
-Incluye:
+- **Acción**  
+  Decisiones continuas de *bidding* y asignación entre mercado spot y servicios FCAS.
 
-- precios de múltiples mercados;
-- representación temporal extraída por el TTFE;
-- estado de carga del BESS.
+- **Restricciones**  
+  El BESS debe respetar capacidad, potencia y compatibilidad entre energía reservada para distintos servicios.
 
-**Acción**  
-Decisiones continuas de *bidding* y asignación entre mercado spot y servicios FCAS.
+- **Reward**  
+  Combina los ingresos obtenidos por las distintas vías de mercado y las consecuencias operativas de la decisión.
 
-**Restricciones**  
-El BESS debe respetar capacidad, potencia y compatibilidad entre energía reservada para distintos servicios.
+- **Datos y evaluación**  
+  Se utilizan precios realistas del Australian National Electricity Market. El artículo compara el enfoque con estrategias basadas en optimización y con otros métodos DRL, reportando una mejora relevante y mayor rentabilidad de la participación conjunta frente a operar mercados de forma aislada [[36]](#ref-36).
 
-**Reward**  
-Combina los ingresos obtenidos por las distintas vías de mercado y las consecuencias operativas de la decisión.
-
-**Datos y evaluación**  
-Se utilizan precios realistas del Australian National Electricity Market. El artículo compara el enfoque con estrategias basadas en optimización y con otros métodos DRL, reportando una mejora relevante y mayor rentabilidad de la participación conjunta frente a operar mercados de forma aislada [[36]](#ref-36).
-
-**Aprendizajes transferibles**
-
-- El estado interno del activo condiciona las decisiones futuras.
-- Las decisiones multi-mercado generan coste de oportunidad entre mercados.
-- La información temporal puede aportar valor, pero debe compararse contra MLP simples antes de justificar arquitecturas más complejas.
+- **Aprendizajes transferibles**
+  - El estado interno del activo condiciona las decisiones futuras.
+  - Las decisiones multi-mercado generan coste de oportunidad entre mercados.
+  - La información temporal puede aportar valor, pero debe compararse contra MLP simples antes de justificar arquitecturas más complejas.
 
 ## 7.3. Estrategias multi-mercado para renovables con almacenamiento
 
-**Referencia principal**  
-Cardo-Miota *et al.*, *Applied Energy* (2025) [[37]](#ref-37).
+- **Referencia principal**  
+  Cardo-Miota *et al.*, *Applied Energy* (2025) [[37]](#ref-37).
 
-**Objetivo**  
-Maximizar ingresos de un sistema renovable + BESS participando simultáneamente en el mercado day-ahead y en servicios de reserva del programa DS3 en Irlanda.
+- **Objetivo**  
+  Maximizar ingresos de un sistema renovable + BESS participando simultáneamente en el mercado day-ahead y en servicios de reserva del programa DS3 en Irlanda.
 
-**Enfoque**  
-El problema se formula como MDP y utiliza TD3 como algoritmo actor–critic de acción continua [[37]](#ref-37).
+- **Enfoque**  
+  El problema se formula como MDP y utiliza TD3 como algoritmo actor–critic de acción continua [[37]](#ref-37).
 
-**Estado**  
-Combina:
+- **Estado**
+  - señales y precios de mercado;
+  - producción renovable;
+  - estado del almacenamiento.
 
-- señales y precios de mercado;
-- producción renovable;
-- estado del almacenamiento.
+- **Datos**  
+  El caso de estudio utiliza datos históricos de una planta fotovoltaica de 7 MW y un BESS de 1 MWh [[37]](#ref-37).
 
-**Datos**  
-El caso de estudio utiliza datos históricos de una planta fotovoltaica de 7 MW y un BESS de 1 MWh [[37]](#ref-37).
+- **Acción**  
+  Decisiones continuas de uso del almacenamiento y participación en mercados.
 
-**Acción**  
-Decisiones continuas de uso del almacenamiento y participación en mercados.
+- **Restricciones**
+  - capacidad del BESS;
+  - potencia;
+  - SoC;
+  - compatibilidad con los servicios de mercado.
 
-**Restricciones**
+- **Reward**  
+  Resultado económico agregado de la participación multi-mercado, sujeto a las restricciones del activo.
 
-- capacidad del BESS;
-- potencia;
-- SoC;
-- compatibilidad con los servicios de mercado.
+- **Evaluación**  
+  El artículo compara el agente con estrategias de referencia y reporta beneficios económicos adicionales en los escenarios estudiados [[37]](#ref-37).
 
-**Reward**  
-Resultado económico agregado de la participación multi-mercado, sujeto a las restricciones del activo.
-
-**Evaluación**  
-El artículo compara el agente con estrategias de referencia y reporta beneficios económicos adicionales en los escenarios estudiados [[37]](#ref-37).
-
-**Aprendizajes transferibles**
-
-- Las restricciones físicas deben formar parte del entorno, no añadirse después.
-- Conviene reportar resultado por mercado para entender de dónde procede la mejora.
-- El valor de una política multi-mercado debe medirse frente a un baseline con información comparable.
+- **Aprendizajes transferibles**
+  - Las restricciones físicas deben formar parte del entorno, no añadirse después.
+  - Conviene reportar resultado por mercado para entender de dónde procede la mejora.
+  - El valor de una política multi-mercado debe medirse frente a un baseline con información comparable.
 
 ## 7.4. Intradiario continuo para renovables: beneficio y penalización por desvío
 
-**Referencia principal**  
-Abate, Liu, Liu y Zhang (2025) [[38]](#ref-38).
+- **Referencia principal**  
+  Abate, Liu, Liu y Zhang (2025) [[38]](#ref-38).
 
-**Objetivo**  
-Optimizar el trading intradiario continuo de una planta fotovoltaica bajo incertidumbre de generación y precios, equilibrando beneficio de trading y coste de desbalance.
+- **Objetivo**  
+  Optimizar el trading intradiario continuo de una planta fotovoltaica bajo incertidumbre de generación y precios, equilibrando beneficio de trading y coste de desbalance.
 
-**Algoritmo**  
-El trabajo utiliza PPO con una política deliberadamente interpretable [[38]](#ref-38).
+- **Algoritmo**  
+  El trabajo utiliza PPO con una política deliberadamente interpretable [[38]](#ref-38).
 
-**Estado**  
-Combina variables de mercado, microestructura, información histórica y señales relacionadas con la producción y el *forecast*.
+- **Estado**  
+  Combina variables de mercado, microestructura, información histórica y señales relacionadas con la producción y el *forecast*.
 
-Esto es coherente con los bloques propuestos en **3.2 — Espacio de estado u observación**.
+  Esto es coherente con los bloques propuestos en **3.2 — Espacio de estado u observación**.
 
-**Acción**  
-El agente ajusta la estrategia de trading de forma secuencial a medida que cambia la información disponible.
+- **Acción**  
+  El agente ajusta la estrategia de trading de forma secuencial a medida que cambia la información disponible.
 
-**Reward**  
-Balancea:
+- **Reward**
+  - beneficio de trading;
+  - penalización asociada al desbalance.
 
-- beneficio de trading;
-- penalización asociada al desbalance.
+  Esta formulación es especialmente relevante para **3.4 — Función de recompensa**, porque evita optimizar beneficio bruto ignorando el coste final de una posición residual.
 
-Esta formulación es especialmente relevante para **3.4 — Función de recompensa**, porque evita optimizar beneficio bruto ignorando el coste final de una posición residual.
+- **Evaluación**  
+  El modelo se entrena con históricos y se evalúa *out-of-sample*. El trabajo reporta mejora consistente frente a los benchmarks utilizados [[38]](#ref-38).
 
-**Evaluación**  
-El modelo se entrena con históricos y se evalúa *out-of-sample*. El trabajo reporta mejora consistente frente a los benchmarks utilizados [[38]](#ref-38).
-
-**Aprendizajes transferibles**
-
-- El intradiario puede entenderse como mecanismo de ajuste progresivo de posición.
-- Reward y desvío deben modelarse conjuntamente.
-- La evaluación temporal fuera de muestra es obligatoria.
-- Una política más interpretable puede facilitar validación operativa y gobierno del modelo.
+- **Aprendizajes transferibles**
+  - El intradiario puede entenderse como mecanismo de ajuste progresivo de posición.
+  - Reward y desvío deben modelarse conjuntamente.
+  - La evaluación temporal fuera de muestra es obligatoria.
+  - Una política más interpretable puede facilitar validación operativa y gobierno del modelo.
 
 ## 7.5. Multiagente, simulación estratégica y mercados locales
 
-**Referencia principal**  
-Bâra y Oprea, *Systems Research and Behavioral Science* (2026) [[39]](#ref-39).
+- **Referencia principal**  
+  Bâra y Oprea, *Systems Research and Behavioral Science* (2026) [[39]](#ref-39).
 
-**Objetivo**  
-Modelar trading en mercados eléctricos locales con prosumidores heterogéneos, integrando generación, consumo flexible, vehículos eléctricos y calefacción.
+- **Objetivo**  
+  Modelar trading en mercados eléctricos locales con prosumidores heterogéneos, integrando generación, consumo flexible, vehículos eléctricos y calefacción.
 
-**Arquitectura**  
-El trabajo combina:
+- **Arquitectura**  
+  El trabajo combina:
+  - Mesa para ABM;
+  - PyMarket para el mecanismo de mercado;
+  - PPO de Stable-Baselines3 como política de *bidding* [[39]](#ref-39).
 
-- Mesa para ABM;
-- PyMarket para el mecanismo de mercado;
-- PPO de Stable-Baselines3 como política de *bidding* [[39]](#ref-39).
+  Esta combinación ilustra la diferencia explicada en **4.4 — Aprendizaje multiagente y jerárquico**: el ABM representa el ecosistema de agentes y RL optimiza decisiones dentro de ese ecosistema.
 
-Esta combinación ilustra la diferencia explicada en **4.4 — Aprendizaje multiagente y jerárquico**: el ABM representa el ecosistema de agentes y RL optimiza decisiones dentro de ese ecosistema.
+- **Estrategias comparadas**
+  - **S1:** el agente determina principalmente el precio de puja.
+  - **S2:** el agente optimiza precio y cantidad y coordina flexibilidad de cargas [[39]](#ref-39).
 
-**Estrategias comparadas**
+- **Datos y simulación**  
+  El artículo utiliza una comunidad de 114 hogares, datos de consumo a resolución de 15 minutos y simulación de un año, con DAM e IDM locales [[39]](#ref-39).
 
-- **S1:** el agente determina principalmente el precio de puja.
-- **S2:** el agente optimiza precio y cantidad y coordina flexibilidad de cargas [[39]](#ref-39).
+- **Reward**  
+  Se calcula a partir del resultado de mercado después del *clearing* y guía a PPO hacia mejores decisiones de *bidding*.
 
-**Datos y simulación**  
-El artículo utiliza una comunidad de 114 hogares, datos de consumo a resolución de 15 minutos y simulación de un año, con DAM e IDM locales [[39]](#ref-39).
+- **Métricas**  
+  El trabajo utiliza KPIs de comunidad y ahorro financiero, y reporta que S2 supera a S1. En verano, por ejemplo, el ahorro financiero reportado pasa de 11,58 % a 17,88 %; en invierno, de 4,21 % a 5,38 % [[39]](#ref-39).
 
-**Reward**  
-Se calcula a partir del resultado de mercado después del *clearing* y guía a PPO hacia mejores decisiones de *bidding*.
-
-**Métricas**  
-El trabajo utiliza KPIs de comunidad y ahorro financiero, y reporta que S2 supera a S1. En verano, por ejemplo, el ahorro financiero reportado pasa de 11,58 % a 17,88 %; en invierno, de 4,21 % a 5,38 % [[39]](#ref-39).
-
-**Aprendizajes transferibles**
-
-- Es una referencia útil para entender interacción entre agentes, *clearing* y flexibilidad.
-- No debe trasladarse directamente a OMIE: la escala, reglas y tipo de participantes son diferentes.
-- Su principal valor metodológico aparece cuando se desea abandonar el supuesto *price-taker*.
+- **Aprendizajes transferibles**
+  - Es una referencia útil para entender interacción entre agentes, *clearing* y flexibilidad.
+  - No debe trasladarse directamente a OMIE: la escala, reglas y tipo de participantes son diferentes.
+  - Su principal valor metodológico aparece cuando se desea abandonar el supuesto *price-taker*.
 
 ## 7.6. Síntesis comparativa de los casos
 
