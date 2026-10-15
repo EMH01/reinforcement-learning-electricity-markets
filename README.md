@@ -21,7 +21,7 @@ The report covers:
 - market, asset, execution, and physical-system simulation
 - point-in-time data and leakage prevention
 - temporal backtesting, baselines, risk metrics, and reproducibility
-- general application patterns reported in the electricity-market RL literature
+- five detailed published case studies covering day-ahead bidding, BESS multi-market strategies, renewables + storage, continuous intraday trading, and agent-based local-market simulation
 
 ## Sources and scope
 
